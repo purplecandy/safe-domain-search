@@ -5,3 +5,5 @@ import {main} from '../models';
 export function CheckDomain(arg1:string,arg2:boolean):Promise<main.DomainCheckResponse>;
 
 export function Greet(arg1:string):Promise<string>;
+
+export function OpenLink(arg1:string):Promise<void>;

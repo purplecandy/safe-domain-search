@@ -1,4 +1,4 @@
-import { CheckDomain } from "../wailsjs/go/main/App";
+import { CheckDomain, OpenLink } from "../wailsjs/go/main/App";
 
 document.getElementById("search-form").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -6,12 +6,13 @@ document.getElementById("search-form").addEventListener("submit", async (e) => {
   console.log("Form submitted");
 
   const input = document.getElementById("domain-input");
-  const force = document.getElementById("force-check").checked;
+  const force = document.getElementById("force-check").checked === true;
+  const errorBox = document.getElementById("error-container");
+  errorBox.hidden = true;
 
   const results = document.getElementById("results");
   const domain = input.value.trim();
 
-  console.log("Domain to check:", domain);
   if (!domain) return;
 
   // Reset and show loading
@@ -25,7 +26,13 @@ document.getElementById("search-form").addEventListener("submit", async (e) => {
   try {
     const res = await CheckDomain(domain, force);
 
-    console.log("CheckDomain result:", res);
+    if (
+      res.error ||
+      Object.values(res.checks).some((c) => c.status === "error")
+    ) {
+      errorBox.hidden = false;
+    }
+
     // Build a result card
     const statusBadge = res.isAvailable
       ? `<mark class="secondary">✅ Available</mark>`
@@ -69,4 +76,12 @@ document.getElementById("search-form").addEventListener("submit", async (e) => {
     `;
     console.error(err);
   }
+});
+
+document.querySelectorAll("[data-open-link]").forEach((el) => {
+  el.addEventListener("click", (e) => {
+    e.preventDefault();
+    const url = el.getAttribute("href");
+    if (url) OpenLink(url);
+  });
 });

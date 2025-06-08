@@ -3,6 +3,7 @@ export namespace main {
 	export class CheckResult {
 	    status: string;
 	    details: string;
+	    error?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new CheckResult(source);
@@ -12,12 +13,14 @@ export namespace main {
 	        if ('string' === typeof source) source = JSON.parse(source);
 	        this.status = source["status"];
 	        this.details = source["details"];
+	        this.error = source["error"];
 	    }
 	}
 	export class DomainCheckResponse {
 	    domain: string;
 	    isAvailable: boolean;
 	    checks: Record<string, CheckResult>;
+	    error?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new DomainCheckResponse(source);
@@ -28,6 +31,7 @@ export namespace main {
 	        this.domain = source["domain"];
 	        this.isAvailable = source["isAvailable"];
 	        this.checks = this.convertValues(source["checks"], CheckResult, true);
+	        this.error = source["error"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

@@ -9,3 +9,7 @@ export function CheckDomain(arg1, arg2) {
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
+
+export function OpenLink(arg1) {
+  return window['go']['main']['App']['OpenLink'](arg1);
+}

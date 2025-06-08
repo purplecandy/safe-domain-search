@@ -26,9 +26,13 @@
         </form>
 
         <div id="results"></div>
+        <div id="error-container" role="alert" hidden class="contrast"
+            style="margin-top: var(--spacing); padding: var(--spacing); border-radius: var(--border-radius); color: red;">
+            <strong>Some checks failed due to network or lookup errors.</strong><br />
+        </div>
         <br>
 
-        <details>
+        <details style="max-height: 300px; overflow: auto;">
             <summary>Why use Safe Domain Search?</summary>
             <p>
                 Most domain checkers aren't truly private. When you search for a domain on typical websites,
@@ -43,7 +47,7 @@
                 themselves,
                 either to resell it to you at a premium or block you from getting it. This isn’t a myth — people
                 have
-                <a href="#frontrunning-example" data-target="frontrunning-example">caught major registrars doing
+                <a href="https://news.ycombinator.com/item?id=96246" data-open-link>caught major registrars doing
                     this</a>.
             </p>
             <p>
@@ -79,7 +83,15 @@
             </ul>
             </p>
         </details>
-
+        <footer
+            style="position: absolute; bottom: 0; width: 100%; margin-top: var(--spacing); text-align: center; font-size: 0.9em;">
+            <hr />
+            <p>
+                A small project by <a href="https://github.com/purplecandy/safe-domain-search" target="_blank"
+                    rel="noopener">@purplecandy</a>. Built to stay private.
+            </p>
+            </p>
+        </footer>
 
     </main>
     <script src="./src/main.js" type="module"></script>

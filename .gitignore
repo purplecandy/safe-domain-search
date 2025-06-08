@@ -1,0 +1,43 @@
+# Wails build output
+/build/
+bin/
+dist/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Vite or other frontend tools
+.vite/
+*.tsbuildinfo
+
+# Go
+/go.sum
+*.test
+*.exe
+*.out
+
+# IDE/editor files
+.vscode/
+.idea/
+*.sw?
+*.sublime*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dependency directories
+vendor/
+
+# Logs
+*.log
+
+# Environment files (optional)
+.env
+.env.*
+
+# Wails-specific
+/wailsjs/

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <link rel="stylesheet" href="./src/style.css" />
+    <link rel="stylesheet" href="./src/pico.min.css" />
+    <title>safe-domain-search</title>
+</head>
+
+<body>
+    <main class="container">
+        <h1>Safe Domain Search</h1>
+        <p>Search for a domain without worrying frontrunning.</p>
+        <form id="search-form">
+            <fieldset role="group">
+                <input type="text" id="domain-input" placeholder="Enter domain name like example.com" required />
+                <button type="submit">Search</button>
+            </fieldset>
+        </form>
+        <div id="results"></div>
+    </main>
+    <script src="./src/main.js" type="module"></script>
+</body>
+
+</html>

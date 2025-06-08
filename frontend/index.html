@@ -13,13 +13,74 @@
     <main class="container">
         <h1>Safe Domain Search</h1>
         <p>Search for a domain without worrying frontrunning.</p>
+
         <form id="search-form">
             <fieldset role="group">
                 <input type="text" id="domain-input" placeholder="Enter domain name like example.com" required />
                 <button type="submit">Search</button>
             </fieldset>
+            <label for="force-check">
+                <input type="checkbox" id="force-check" name="force-check" />
+                Perform all checks (DNS, NS, WHOIS)
+            </label>
         </form>
+
         <div id="results"></div>
+        <br>
+
+        <details>
+            <summary>Why use Safe Domain Search?</summary>
+            <p>
+                Most domain checkers aren't truly private. When you search for a domain on typical websites,
+                your query may be logged or even shared with third parties. This opens you up to a shady
+                practice
+                called
+                <strong>domain front-running</strong>.
+            </p>
+            <p>
+                Domain front-running is when someone — often a registrar — sees your search and registers the
+                domain
+                themselves,
+                either to resell it to you at a premium or block you from getting it. This isn’t a myth — people
+                have
+                <a href="#frontrunning-example" data-target="frontrunning-example">caught major registrars doing
+                    this</a>.
+            </p>
+            <p>
+                <strong>Safe Domain Search</strong> avoids that. Your search stays on your machine. No
+                analytics, no
+                tracking,
+                no risk of frontrunners getting a heads-up.
+            </p>
+
+
+
+
+            <blockquote>
+                “I checked availability at GoDaddy, and it was free. Hours later, it was listed as a premium
+                domain
+                for
+                $500 — registered
+                the same day by GoDaddy. I waited a week and bought it for the regular fee elsewhere. Never used
+                GoDaddy
+                again.”
+                <footer>– pixelrow on Reddit</footer>
+            </blockquote>
+
+            <p>
+                Learn more:
+            <ul>
+                <li><a href="https://en.wikipedia.org/wiki/Domain_name_front_running" data-open-link>Wikipedia: Domain
+                        Front Running</a></li>
+                <li><a href="https://news.ycombinator.com/item?id=37802959" data-open-link>Hacker News discussion</a>
+                </li>
+                <li><a href="https://www.namepros.com/threads/how-to-prevent-domain-name-searches-from-being-stolen.1263571/"
+                        data-open-link>NamePros guide</a></li>
+            </ul>
+            </p>
+        </details>
+
+
     </main>
     <script src="./src/main.js" type="module"></script>
 </body>

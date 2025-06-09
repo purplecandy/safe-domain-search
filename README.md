@@ -31,18 +31,21 @@ Domain front-running is real, and it's not paranoia — it’s been reported [on
 
 ## 📦 Install & Run
 
+### Prerequisites
+
+Make sure you have the following installed:
+
+- [Go](https://go.dev/doc/install) (v1.22 or higher)
+- [Node.js v22](https://github.com/nvm-sh/nvm) – easiest with **nvm**
+- [Wails CLI](https://wails.io/docs/gettingstarted/installation)
+
+---
+
+### Get started
+
 ```bash
-# Clone the repo
 git clone https://github.com/purplecandy/safe-domain-search
 cd safe-domain-search
 
-# Install dependencies
-npm install
-go mod tidy
-
-# Run locally
-wails dev
-
-# Build production binary
 wails build
 ```

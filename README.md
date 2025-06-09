@@ -1,5 +1,9 @@
 # Safe Domain Search
 
+<p align="center">
+  <img src="icon.png" alt="App Icon" width="100" />
+</p>
+
 Search domain availability **without getting tracked** or frontrun by registrars.
 
 Most online domain search tools silently log your queries and sometimes share them with 3rd parties. This opens the door to a shady practice called **domain front-running** — where someone (often a registrar) sees your search and registers the domain before you can.

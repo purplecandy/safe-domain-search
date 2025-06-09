@@ -121,6 +121,29 @@ func CheckWhois(domain string) (CheckResult, error) {
 	parsed, err := whoisparser.Parse(raw)
 
 	if err != nil {
+		fmt.Println("Parsing error:", err)
+
+		if errors.Is(err, whoisparser.ErrNotFoundDomain) {
+			return CheckResult{
+				Status:  "passed",
+				Details: "No WHOIS record found",
+			}, nil
+		}
+
+		if errors.Is(err, whoisparser.ErrPremiumDomain) {
+			return CheckResult{
+				Status:  "passed",
+				Details: "Domain is premium or restricted",
+			}, nil
+		}
+
+		if errors.Is(err, whoisparser.ErrReservedDomain) || errors.Is(err, whoisparser.ErrBlockedDomain) {
+			return CheckResult{
+				Status:  "failed",
+				Details: "Domain is reserved or blocked",
+			}, nil
+		}
+
 		return CheckResult{
 			Status:  "error",
 			Details: "Failed to parse WHOIS data",
@@ -128,7 +151,6 @@ func CheckWhois(domain string) (CheckResult, error) {
 		}, err
 	}
 
-	fmt.Println("Parsing error:", err)
 	fmt.Println("Parsed WHOIS data:", parsed)
 
 	if parsed.Registrar == nil || parsed.Registrar.Name == "" {

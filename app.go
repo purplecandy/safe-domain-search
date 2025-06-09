@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 
@@ -47,103 +48,157 @@ func (a *App) Greet(name string) string {
 func CheckDNS(domain string) (CheckResult, error) {
 	ips, err := net.LookupIP(domain)
 	if err != nil {
+		var dnsError *net.DNSError
+		if errors.As(err, &dnsError) && dnsError.IsNotFound {
+			return CheckResult{
+				Status:  "passed",
+				Details: "Domain does not resolve to any IP address",
+			}, nil
+
+		}
 		return CheckResult{
 			Status:  "error",
-			Details: "DNS lookup failed",
+			Details: "Unable to lookup IP address",
 			Error:   err.Error(),
 		}, err
 	}
-	if len(ips) == 0 {
+
+	if len(ips) > 0 {
 		return CheckResult{
 			Status:  "failed",
-			Details: "No IP address found for domain",
+			Details: fmt.Sprintf("Domain resolves to IP: %v", ips[0]),
 		}, nil
 	}
+
 	return CheckResult{
 		Status:  "passed",
-		Details: fmt.Sprintf("Domain resolves to IP: %v", ips[0]),
+		Details: "No IP address found for domain",
 	}, nil
 
 }
 
+func CheckNS(domain string) (CheckResult, error) {
+	nsRecords, err := net.LookupNS(domain)
+	if err != nil {
+		if dnsErr, ok := err.(*net.DNSError); ok && dnsErr.Err == "no such host" {
+			return CheckResult{
+				Status:  "passed",
+				Details: "Domain has no NS records or is unregistered",
+			}, nil
+		}
+		return CheckResult{
+			Status:  "error",
+			Details: "Unable to lookup name servers",
+			Error:   err.Error(),
+		}, err
+	}
+
+	if len(nsRecords) == 0 {
+		return CheckResult{
+			Status:  "passed",
+			Details: "No name servers found for domain",
+		}, nil
+	}
+
+	return CheckResult{
+		Status:  "failed",
+		Details: fmt.Sprintf("Domain has name servers like %s", nsRecords[0].Host),
+	}, nil
+}
+
+func CheckWhois(domain string) (CheckResult, error) {
+	raw, err := whois.Whois(domain)
+	if err != nil {
+		return CheckResult{
+			Status:  "error",
+			Details: "Unable to perform WHOIS lookup",
+			Error:   err.Error(),
+		}, err
+	}
+
+	fmt.Println("Raw WHOIS data:", raw)
+
+	parsed, err := whoisparser.Parse(raw)
+
+	if err != nil {
+		return CheckResult{
+			Status:  "error",
+			Details: "Failed to parse WHOIS data",
+			Error:   err.Error(),
+		}, err
+	}
+
+	fmt.Println("Parsing error:", err)
+	fmt.Println("Parsed WHOIS data:", parsed)
+
+	if parsed.Registrar == nil || parsed.Registrar.Name == "" {
+		return CheckResult{
+			Status:  "passed",
+			Details: "No WHOIS record found",
+		}, nil
+	}
+
+	return CheckResult{
+		Status:  "failed",
+		Details: fmt.Sprintf("Registered via %s", parsed.Registrar.Name),
+	}, nil
+}
+
 func (a *App) CheckDomain(domain string, forceAll bool) (DomainCheckResponse, error) {
+
+	fmt.Println("Checking domain:", domain)
+	fmt.Println("Force all checks:", forceAll)
+
 	result := DomainCheckResponse{
 		Domain: domain,
 		Checks: make(map[string]CheckResult),
 	}
 
 	// Step 1: DNS Check
-	ips, err := net.LookupIP(domain)
 
-	if err == nil && len(ips) > 0 {
-		result.Checks["dns"] = CheckResult{
-			Status:  "failed",
-			Details: fmt.Sprintf("Domain resolves to IP: %v", ips[0]),
-		}
+	fmt.Println("Performing DNS check...")
+	dnsResult, _ := CheckDNS(domain)
+
+	result.Checks["dns"] = dnsResult
+
+	if dnsResult.Status == "passed" {
+		result.IsAvailable = true
+		result.Checks["ns"] = CheckResult{Status: "skipped", Details: "DNS check already confirmed registration"}
+		result.Checks["whois"] = CheckResult{Status: "skipped", Details: "DNS check already confirmed registration"}
+
 		if !forceAll {
-			result.IsAvailable = false
-			result.Checks["ns"] = CheckResult{Status: "skipped", Details: "DNS check already confirmed registration"}
-			result.Checks["whois"] = CheckResult{Status: "skipped", Details: "DNS check already confirmed registration"}
 			return result, nil
-		}
-	} else {
-		result.Checks["dns"] = CheckResult{
-			Status:  "error",
-			Details: "Unable to lookup IP address",
-			Error:   err.Error(),
 		}
 	}
 
+	fmt.Println("DNS check result:", dnsResult)
 	// Step 2: NS Check
-	nsRecords, err := net.LookupNS(domain)
+	fmt.Println("Performing NS check...")
+	nsResult, _ := CheckNS(domain)
+	result.Checks["ns"] = nsResult
 
-	if err == nil && len(nsRecords) > 0 {
-		result.Checks["ns"] = CheckResult{
-			Status:  "failed",
-			Details: fmt.Sprintf("Domain has name servers like %s", nsRecords[0].Host),
-		}
+	if nsResult.Status == "passed" {
+		result.IsAvailable = true
+		result.Checks["whois"] = CheckResult{Status: "skipped", Details: "NS check already confirmed registration"}
 		if !forceAll {
-			result.IsAvailable = false
-			result.Checks["whois"] = CheckResult{Status: "skipped", Details: "NS check already confirmed registration"}
 			return result, nil
 		}
-	} else {
-		result.Checks["ns"] = CheckResult{
-			Status:  "error",
-			Details: "Unable to lookup IP address",
-			Error:   err.Error(),
-		}
 	}
+
+	fmt.Println("NS check result:", nsResult)
 
 	// Step 3: WHOIS Check
-	raw, err := whois.Whois(domain)
+	fmt.Println("Performing WHOIS check...")
+	whoisResult, _ := CheckWhois(domain)
+	result.Checks["whois"] = whoisResult
 
-	if err != nil {
-		result.Checks["whois"] = CheckResult{
-			Status:  "error",
-			Details: err.Error(),
-		}
-		result.IsAvailable = false
-		return result, nil
-	}
-
-	parsed, err := whoisparser.Parse(raw)
-
-	if err != nil || parsed.Registrar.Name == "" {
-		result.Checks["whois"] = CheckResult{
-			Status:  "passed",
-			Details: "No WHOIS record found",
-		}
+	if whoisResult.Status == "passed" {
 		result.IsAvailable = true
-	} else {
-		result.Checks["whois"] = CheckResult{
-			Status:  "failed",
-			Details: fmt.Sprintf("Registered via %s", parsed.Registrar.Name),
-		}
-		result.IsAvailable = false
+
 	}
 
 	return result, nil
+
 }
 
 func (a *App) OpenLink(link string) {

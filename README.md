@@ -14,6 +14,8 @@ Safe Domain Search protects your query by running all checks **locally**, using 
 
 ![Available Screenshot](screenshot-success.png)
 
+[Demo](https://x.com/realpurplecandy/status/1932137314660348017)
+
 ## 🔍 What It Does
 
 - Checks if a domain resolves via **DNS**

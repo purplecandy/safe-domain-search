@@ -6,6 +6,10 @@ Most online domain search tools silently log your queries and sometimes share th
 
 Safe Domain Search protects your query by running all checks **locally**, using Go and Wails, with no analytics or telemetry.
 
+![Not Available Screenshot](screenshot-failed.png)
+
+![Available Screenshot](screenshot-success.png)
+
 ## 🔍 What It Does
 
 - Checks if a domain resolves via **DNS**
